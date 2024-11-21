@@ -26,7 +26,7 @@ public class LinksUteisController {
     private final CreateLinksUteisUseCase createLinksUteisUseCase;
 
     @GetMapping
-    public Flux<LinksUteisResponse> getAllLinksUteis(@RequestParam String title) {
+    public Flux<LinksUteisResponse> getAllLinksUteis(@RequestParam(required = false) String title) {
         final var getLinks = GetLinksUteis.builder()
                 .title(title)
                 .build();

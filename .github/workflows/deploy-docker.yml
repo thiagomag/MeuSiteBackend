@@ -9,33 +9,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: production  # Especifica o environment "production" para este job
+    environment: production
 
     steps:
+      # Step 1: Checkout o código
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 1: Configurar o JDK 21
+      # Step 2: Configurar o JDK 21
       - name: Set up JDK 21
         uses: actions/setup-java@v1
         with:
           java-version: '21'
 
-      # Step 2: Build com Gradle usando o JDK 21
+      # Step 3: Build com Gradle usando o JDK 21
       - name: Build with Gradle
         run: chmod +x ./gradlew && ./gradlew build
 
-      # Step 3: Build imagem docker
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest .
+      # Step 4: Configurar Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      # Step 4: Login no docker hub
+      # Step 5: Login no Docker Hub
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # Step 5: Push imagem docker para o Docker Hub
-      - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
+      # Step 6: Build multi-architecture Docker image
+      - name: Build and push Docker image (multi-arch)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
+          platforms: linux/amd64,linux/arm64
 
 #  deploy:
 #    runs-on: ubuntu-latest

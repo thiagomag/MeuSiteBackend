@@ -3,8 +3,8 @@ spring:
     name: MeuSiteBackend
   r2dbc:
     url: r2dbc:pool:postgresql://postgres:postgres@localhost:5432/meu_site
-    password: remoto
-    username: 438537
+    password: postgres
+    username: postgres
   webflux:
     base-path: /meu-site-backend
 server:
